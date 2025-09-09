@@ -1,62 +1,188 @@
 = Getting Started
 
-This repo contains the files that you need to start a new Neo4j documentation project.
+== Installation
 
-== antora.yml
+=== Upload the jar and connection details
+1. Download the most recent version of the connector from link:https://github.com/neo4j/neo4j-aws-glue/releases[AWS Glue connector - GitHub]
+2. Upload the connector, `neo4j-aws-glue-<version>.jar` file to Amazon S3 bucket
+3. Store the connection details for Neo4j or AuraDB in AWS Secret Manager as key/value pairs for _user_ and _password_
+4. Record/copy the Secret ARN as this will be required later when using the secret from the connection
 
-- `name:` - replace `docs-template` with the name of the project as it will appear in the URL https://neo4j.com/docs/<PROJECT_NAME>`, for example 'getting-started', 'cypher-manual'.
-- `title:` - the title of the manual, for example Getting Started Guide, Cypher Manual. This value is displayed in the breadcrumbs above each page.
-- `version:` - the version of the content that is generated from the branch containing this `antora.yml` file.
+[NOTE]
+====
+Instead of using the naming from the environment file (_neo4j_user_ and _neo4j_password_) this guide uses _user_ and _password_.
+====
 
-Optionally, you can add the following attributes:
+=== Create a custom connector 
+In the AWS Glue console
 
-- `display_version:` - Use this attribute when you want the version that is displayed in your content and in the UI to be different from the version that appears in the URL. For example, you might want to use _/2.0/_ in URLs, but display the version as `2.0-beta` in the version selector drop-down.
-- `prerelease:` - if you publish multiple versions of this project, you can mark a version as being a prerelease, by adding `prerelease: true`. The content is published alongside the other versions, but does not appear in the drop-down version selector, and is not included when Antora is calculating the default (or 'latest') version in order to resolve links between pages. For more information, see link:https://docs.antora.org/antora/latest/component-prerelease/[Antora Docs -> Identify a Prerelease Version]
+1. Select _Create custom connector_
+2. Give the connector a name e.g. `Neo4j-Connector-for-AWS-Glue`
+3. For _Connector S3 URL_ provide the link to the connector in the S3 bucket (from above)
+4. Provide the class name `org.neo4j.jdbc.Neo4jJdbcDriver`
+5. Provide the following JDBC base URL `jdbc:neo4j+s://<aura>?enableSQLTranslation=true` to enable the JDBC driver's built-in translator feature to translate SQL commands to Cypher
+6. Set the URL parameter delimiter to `&`
 
-== preview.yml
+=== Creating a connection
 
-Antora uses a link:https://docs.antora.org/antora/latest/playbook/[playbook] to determine what content is included in a site, and the appearance of that content.
+A connection can only be created after you have created the custom connector in the previous step.
+It is essential to use the key/value pairs of _user_ and _password_ provided in the AWS Secrets Manager because those properties must be used for the actual connection. 
 
-In our projects, we use `preview.yml` as the default playbook name.
+1. Provide a connection name e.g. `aws-glue-connection-to-neo4j-auradb`
+2. For connection credential type, select _<default>_
+3. For AWS Secret, select _Secret from this account_
+4. Provide the name of the secret used to store the credentials above
+5. Expand Additional Options and provide the following additional parameters as pairs
 
-Update the `start_page` attribute to match the value of the `name` attribute in your `antora.yml` file.
+|====
+|Key|Property
+|user|$\{user}
+|password|$\{password}
+|====
 
-----
-site:
-  start_page: docs-template:ROOT:index.adoc
-----
+== Quickstart
+The following Quickstarts demonstrate how to use the AWS Glue Connector to perform an import of **TODO** <name of data set> <available here> **TODO** and export a subset of the data to Parquet files on S3 using the Visual ETL Editor.
+The Quickstarts assume the Getting Started guide has been used to install the connector and configure a connection to the database, please change the connection name accordingly. 
 
-Update the information for the sitemap extension:
+=== Create the blueprint Schema in AuraDB/Neo4j
+1. Use Query or Browser to create a blueprint schema that describes the nodes, relationships and properties that will be imported.
 
-----
-antora:
-  extensions:
-  - require: "@neo4j-antora/antora-modify-sitemaps"
-    sitemap_version: '1.0'
-    sitemap_loc_version: 'current'
-    move_sitemaps_to_components: true
-----
+[WARNING]
+====
+**TODO**
+```
+Cypher statements to create nodes, relationships, properties
+```
+====
 
-The link:https://www.npmjs.com/package/@neo4j-antora/antora-modify-sitemaps[`antora-modify-sitemaps`] Antora extension generates sitemaps for Neo4j docs that include information about the current release only, and makes sure those sitemaps are included in the right output folder when the HTML is built.
-In this example, a sitemap file would be generated at _build/site/docs-template/1.0/sitemap.xml_.
-Change the value of `sitemap_version` to the 'current' release version of your project.
-For example, Neo4j manuals such as the Getting Started Guide or Cypher Manual use 4.4 as their current version, so for those manuals this is set as `sitemap_version: '4.4`.
+=== Importing nodes into AuraDB/Neo4j
+1. In the AWS Glue console, select Visual ETL, title the job e.g. Import data from Parquet on S3 into AuraDB
+2. Select Amazon S3 from the list of Sources, and select S3 source type, S3 location and Browse to S3 to locate the files for import
+3. Select the Parquet files containing the nodes for import first
+4. Select _Infer schema_
+5. From the list of targets select `Neo4j-Connector-for-AWS-Glue`
+6. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`
+7. The table name should be set to the name of the labels that are to be imported e.g. `Movie`.
+8. The schema will be displayed, if you want to drop any columns then add a Transform - DropFields steps (or other suitable transformations).
+If this data is from another Neo4j database then you should drop the `v$id`.
+9. Add flows for each set of import files and table names. For nodes these may be added in parallel.
+10. Start the import job.
 
-== [Optional] Add an 'Edit this page' link
+=== Importing relationships into AuraDB/Neo4j
+Once the nodes have been imported you can import the relationships. 
+You can add these as additional steps after the steps to import the nodes i.e. in series OR create a new import job.
 
-If your repo is public, you can add an `Edit this page` link to your pages to encourage external contributors, and to provide a quick way for users to suggest changes.
+1. Select the Parquet files containing the nodes for import first
+2. Select _Infer schema_
+3. From the list of targets select `Neo4j-Connector-for-AWS-Glue`
+4. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`
 
-Update the following attribute in your playbook:
+[WARNING]
+====
+**TODO**
+<need details on creating the custom code block>
+====
 
-----
-asciidoc:
-  attributes:
-    page-origin-private: false
-----
+```python
+def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
+    # ==============================================================================
+    # AWS Glue Custom Transformation Script for Neo4j
+    # This script defines a function to be used in a Visual ETL job.
+    # It connects to Neo4j and executes Cypher queries as a side-effect.
+    #
+    # NOTE: The password is hardcoded for initial testing. For production,
+    # it is highly recommended to retrieve the password from a secure source
+    # like AWS Secrets Manager.
+    # ==============================================================================
+    
+    import sys
+    from neo4j import GraphDatabase
+    from awsglue.transforms import *
+    from awsglue.utils import getResolvedOptions
+    from pyspark.context import SparkContext
+    from awsglue.context import GlueContext
+    from awsglue.job import Job
+    
+    # Hardcoded Neo4j connection details
+    NEO4J_USER = 'neo4j'
+    NEO4J_URI = 'neo4j+s://auradb.databases.neo4j.io'
+    NEO4J_PASSWORD = 'Password’
+    
+    def execute_cypher_queries(driver, query_list):
+    """
+    Executes a list of Cypher queries within a single Neo4j session.
+    """
+    with driver.session() as session:
+        for query in query_list:
+            try:
+                session.run(query)
+                print(f"Successfully executed query: {query.strip().splitlines()[0]}...")
+            except Exception as e:
+                print(f"Error executing query: {query}\nError: {e}")
+                raise
+    
+    def neo4j_cypher_transformation(dynamic_frame):
+    """
+    This is the main function for the custom transformation.
+    It will be called by the AWS Glue Visual ETL job.
+    
+    Args:
+        dynamic_frame: The input DynamicFrame from the previous step.
+        
+    Returns:
+        The original DynamicFrame, as no data manipulation is performed.
+    """
+    print("Starting Neo4j Cypher transformation...")
+    
+    try:        
+        # Define the Cypher queries to be executed
+        cypher_queries = [
+            """
+            MATCH (j:OrderCustomerJoin)
+            MATCH (c:Customer {customer_id: j.customer_id})
+            MATCH (o:Order {order_id: j.order_id})
+            MERGE (c)-[:ORDERED]->(o);
+            """,
+            """
+            MATCH (j:OrderCustomerJoin) DELETE j;
+            """
+        ]
+        
+        # Connect to Neo4j and execute queries using the hardcoded password
+        driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+        print("Successfully connected to Neo4j AuraDB.")
+        
+        execute_cypher_queries(driver, cypher_queries)
+        
+    except Exception as e:
+        print(f"An error occurred in the transformation: {e}")
+        # In a real-world scenario, you might want to handle this more gracefully
+        # or log the error before re-raising.
+        raise e
+        
+    finally:
+        if 'driver' in locals() and driver:
+            driver.close()
+            print("Neo4j driver connection closed.")
+            
+    print("Neo4j Cypher transformation completed.")
+    
+    # This transformation does not modify the data, so it returns the original DynamicFrame.
+    return dynamic_frame
+    
+    # Note: The glue job will automatically call the function you define
+    # when you configure the custom transformation in Visual ETL.
+```
 
-== [Optional] Add a 'preview' note to each page
+=== Exporting from AuraDB/Neo4j
+1. In the AWS Glue console, select Visual ETL, title the job e.g. _Export data from AuraDB to Parquet on S3_
+2. Select `Neo4j-Connector-for-AWS-Glue` from the list of Sources
+3. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`
+4. The Table name should be set to the name of the labels that are to be imported e.g. `Movie`
+5. The _Data preview_ should populate with a sample of the data
+6. Browse the list of targets and select S3 source type, S3 location and browse to S3 location for storing the Parquet files
+7. The schema will be displayed, if you want to drop any columns then add a Transform - DropFields steps (or other suitable transformations).
+If this data is from another Neo4j database then you should drop the `v$id`
+8. Add flows for each set of import files and table names. For nodes these may be added in parallel.
+9. Start the import job.
 
-When we publish preview content to either development or production environments, we prepend an admonition to every page to make it clear that this is preview content, for example, as in link:https://neo4j.com/docs/graph-data-science/2.0-preview/[Graph Data Science 2.0-preview].
-
-You can use the link:https://www.npmjs.com/package/@neo4j-antora/antora-add-notes[antora-add-notes] extension to add content to your pages.
-Follow the Usage instructions in the package documentation.

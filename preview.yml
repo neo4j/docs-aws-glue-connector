@@ -1,7 +1,7 @@
 site:
-  title: Neo4j Docs Template
+  title: Neo4j Connector for AWS Glue
   url: https://neo4j.com/docs
-  start_page: docs-template:ROOT:index.adoc
+  start_page: neo4j-aws-glue:ROOT:index.adoc
 
 content:
   sources:
