@@ -16,6 +16,7 @@ Before you can import data into an empty database you need to define a blueprint
 This blueprint must describe all the node labels, relationship types and properties that exist in the dataset to be imported.
 This is because the Neo4j database is schema optional and AWS Glue expects schema on write which is typical for RDBMS databases. 
 
+////
 For example
 
 [WARNING]
@@ -28,6 +29,7 @@ CREATE (m:NewMovie:Temp{title:'placeholder'})
 <create a relationship>
 ```
 ====
+////
 
 Attempting to import data without creating this blueprint schema will result in the following error 
 ```
@@ -39,8 +41,10 @@ This message applies if the target node label, properties or relationship types 
 Nodes must be imported before relationships, and while AWS Glue only permits a single instance of a job to be run at once the job itself may import from multiple files that describe the nodes and labels at the same time i.e. in parallel.
 
 === Relationships
-Relationships must be created after the nodes in the import job or from a different import job after the node import job has completed. Relationships can only be created in the Visual ETL tool by creating a Custom Code Block that provides the Cypher code to create the relationships. 
+Relationships must be created after the nodes in the import job or from a different import job after the node import job has completed.
+Relationships can only be created in the Visual ETL tool by creating a Custom Code Block that provides the Cypher code to create the relationships. 
 
+////
 For example
 
 [WARNING]
@@ -52,4 +56,4 @@ For example
 ```
 ====
 
-
+////
