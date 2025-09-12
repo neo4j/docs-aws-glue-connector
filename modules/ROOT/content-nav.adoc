@@ -9,4 +9,3 @@
 * xref:reference.adoc#_data_type_mapping[Data type mapping]
 * xref:reference.adoc#_options_and_configuration[Options / Configuration]
 * xref:reference.adoc#_faq_and_troubleshooting[FAQ / Troubleshooting]
-* xref:code-samples.adoc[*Code Samples*]
