@@ -50,7 +50,9 @@ Use Query or Browser to create a blueprint schema that describes the nodes, rela
 ====
 [source,java]
 ```
-CREATE (:Movie{title:'The Matrix'})
+CREATE (m:Movie{title:'The Matrix', released:1999})
+CREATE (p:Person{name:'Keanu Reeves', born:'1964'})
+CREATE (p)-[:ACTED_IN{roles: ['Neo']}]->(m)
 ```
 ====
 

@@ -1,13 +1,13 @@
 = Operations
 
 [#operations-read]
-== Read from Neo4j/Aura (export)
+== Read from AuraDB/Neo4j (export)
 The source for export is the connection created during the installation step e.g. `aws-glue-connection-to-neo4j-auradb`.
 
 The target for the exported data can be any of AWS Glue's supported data sources, for example CSV or Parquet files on S3 or RDBMS with appropriate transformation steps.
 
 [#operations-write]
-== Write to Neo4j (import)
+== Write to AuraDB/Neo4j (import)
 The source data can be any of AWS Glue's supported data sources, for example CSV or Parquet files on S3 or RDBMS with appropriate transformation steps.
 
 The target for import will be the connection created during the installation step e.g. `aws-glue-connection-to-neo4j-auradb`.
