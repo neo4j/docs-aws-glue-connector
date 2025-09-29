@@ -1,4 +1,4 @@
-= Documentation Template
+= Neo4j Connector for AWS Glue Docs
 
 This repo contains the files that you need to start a new Neo4j documentation project.
 

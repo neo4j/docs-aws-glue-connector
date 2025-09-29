@@ -41,17 +41,18 @@ It is essential to use the key/value pairs of _user_ and _password_ provided in 
 |====
 
 == Quickstart
-The following Quickstarts demonstrate how to use the AWS Glue Connector to perform an import of **TODO** <name of data set> <available here> **TODO** and export a subset of the data to Parquet files on S3 using the Visual ETL Editor.
+The following Quickstarts demonstrate how to use the AWS Glue Connector to perform an import of a virtual data set and export a subset of the data to Parquet files on S3 using the Visual ETL Editor.
 The Quickstarts assume the Getting Started guide has been used to install the connector and configure a connection to the database, please change the connection name accordingly. 
 
 === Create the blueprint Schema in AuraDB/Neo4j
-1. Use Query or Browser to create a blueprint schema that describes the nodes, relationships and properties that will be imported.
+Use Query or Browser to create a blueprint schema that describes the nodes, relationships and properties that will be imported.
 
-[WARNING]
 ====
-**TODO**
+[source,java]
 ```
-Cypher statements to create nodes, relationships, properties
+CREATE (m:Movie{title:'The Matrix', released:1999})
+CREATE (p:Person{name:'Keanu Reeves', born:'1964'})
+CREATE (p)-[:ACTED_IN{roles: ['Neo']}]->(m)
 ```
 ====
 
@@ -68,6 +69,7 @@ If this data is from another Neo4j database then you should drop the `v$id`.
 9. Add flows for each set of import files and table names. For nodes these may be added in parallel.
 10. Start the import job.
 
+////
 === Importing relationships into AuraDB/Neo4j
 Once the nodes have been imported you can import the relationships. 
 You can add these as additional steps after the steps to import the nodes i.e. in series OR create a new import job.
@@ -173,7 +175,7 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
     # Note: The glue job will automatically call the function you define
     # when you configure the custom transformation in Visual ETL.
 ```
-
+////
 === Exporting from AuraDB/Neo4j
 1. In the AWS Glue console, select Visual ETL, title the job e.g. _Export data from AuraDB to Parquet on S3_
 2. Select `Neo4j-Connector-for-AWS-Glue` from the list of Sources

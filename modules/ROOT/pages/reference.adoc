@@ -1,14 +1,11 @@
 = Reference
 
 == Data type mapping
-[WARNING]
-====
-**TODO**
-<insert details of data type mapping>
-====
+The type support relies on link:https://neo4j.com/docs/jdbc-manual/current/datatypes/[Neo4j JDBC Driver type support].
+There is no special handling for AWS Glue in place.
 
 == Options and configuration
-Please refer to the [Neo4j JDBC Driver documentation](https://neo4j.com/docs/jdbc-manual/current/) for all the parameters that are supported within the JDBC URL.
+Please refer to the link:https://neo4j.com/docs/jdbc-manual/current/configuration/[Neo4j JDBC Driver documentation] for all the parameters that are supported within the JDBC URL.
 
 == FAQ and troubleshooting
 Most problems can be seen already in the visual ETL flow when AWS Glue tries to render the data preview. At least when running a job, the overview will report the stacktrace with the messages below, if a failure occurs.
