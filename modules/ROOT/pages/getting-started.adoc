@@ -69,113 +69,19 @@ If this data is from another Neo4j database then you should drop the `v$id`.
 9. Add flows for each set of import files and table names. For nodes these may be added in parallel.
 10. Start the import job.
 
-////
 === Importing relationships into AuraDB/Neo4j
 Once the nodes have been imported you can import the relationships. 
 You can add these as additional steps after the steps to import the nodes i.e. in series OR create a new import job.
 
-1. Select the Parquet files containing the nodes for import first
-2. Select _Infer schema_
-3. From the list of targets select `Neo4j-Connector-for-AWS-Glue`
-4. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`
+1. In the AWS Glue console, select Visual ETL, title the job e.g. Import relationship data from Parquet on S3 into AuraDB
+2. Select Amazon S3 from the list of Sources, and select S3 source type, S3 location and Browse to S3 to locate the files for import
+3. Select the Parquet files containing the nodes and relationships for import first
+4. Use a transformer, e.g. "SQL Query" to create the needed output pattern, which should be `(v$person_id, roles, v$movie_id`). 
+5. From the list of targets select `Neo4j-Connector-for-AWS-Glue`
+6. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`
+7. The table name should be set to the (virtual) relationship table: `Person_ACTED_IN_Movie`.
+8. Start the import job.
 
-[WARNING]
-====
-**TODO**
-<need details on creating the custom code block>
-====
-
-```python
-def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
-    # ==============================================================================
-    # AWS Glue Custom Transformation Script for Neo4j
-    # This script defines a function to be used in a Visual ETL job.
-    # It connects to Neo4j and executes Cypher queries as a side-effect.
-    #
-    # NOTE: The password is hardcoded for initial testing. For production,
-    # it is highly recommended to retrieve the password from a secure source
-    # like AWS Secrets Manager.
-    # ==============================================================================
-    
-    import sys
-    from neo4j import GraphDatabase
-    from awsglue.transforms import *
-    from awsglue.utils import getResolvedOptions
-    from pyspark.context import SparkContext
-    from awsglue.context import GlueContext
-    from awsglue.job import Job
-    
-    # Hardcoded Neo4j connection details
-    NEO4J_USER = 'neo4j'
-    NEO4J_URI = 'neo4j+s://auradb.databases.neo4j.io'
-    NEO4J_PASSWORD = 'Password’
-    
-    def execute_cypher_queries(driver, query_list):
-    """
-    Executes a list of Cypher queries within a single Neo4j session.
-    """
-    with driver.session() as session:
-        for query in query_list:
-            try:
-                session.run(query)
-                print(f"Successfully executed query: {query.strip().splitlines()[0]}...")
-            except Exception as e:
-                print(f"Error executing query: {query}\nError: {e}")
-                raise
-    
-    def neo4j_cypher_transformation(dynamic_frame):
-    """
-    This is the main function for the custom transformation.
-    It will be called by the AWS Glue Visual ETL job.
-    
-    Args:
-        dynamic_frame: The input DynamicFrame from the previous step.
-        
-    Returns:
-        The original DynamicFrame, as no data manipulation is performed.
-    """
-    print("Starting Neo4j Cypher transformation...")
-    
-    try:        
-        # Define the Cypher queries to be executed
-        cypher_queries = [
-            """
-            MATCH (j:OrderCustomerJoin)
-            MATCH (c:Customer {customer_id: j.customer_id})
-            MATCH (o:Order {order_id: j.order_id})
-            MERGE (c)-[:ORDERED]->(o);
-            """,
-            """
-            MATCH (j:OrderCustomerJoin) DELETE j;
-            """
-        ]
-        
-        # Connect to Neo4j and execute queries using the hardcoded password
-        driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
-        print("Successfully connected to Neo4j AuraDB.")
-        
-        execute_cypher_queries(driver, cypher_queries)
-        
-    except Exception as e:
-        print(f"An error occurred in the transformation: {e}")
-        # In a real-world scenario, you might want to handle this more gracefully
-        # or log the error before re-raising.
-        raise e
-        
-    finally:
-        if 'driver' in locals() and driver:
-            driver.close()
-            print("Neo4j driver connection closed.")
-            
-    print("Neo4j Cypher transformation completed.")
-    
-    # This transformation does not modify the data, so it returns the original DynamicFrame.
-    return dynamic_frame
-    
-    # Note: The glue job will automatically call the function you define
-    # when you configure the custom transformation in Visual ETL.
-```
-////
 === Exporting from AuraDB/Neo4j
 1. In the AWS Glue console, select Visual ETL, title the job e.g. _Export data from AuraDB to Parquet on S3_
 2. Select `Neo4j-Connector-for-AWS-Glue` from the list of Sources
