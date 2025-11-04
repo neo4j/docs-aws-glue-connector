@@ -73,14 +73,14 @@ If this data is from another Neo4j database then you should drop the `v$id`.
 Once the nodes have been imported you can import the relationships. 
 You can add these as additional steps after the steps to import the nodes i.e. in series OR create a new import job.
 
-1. In the AWS Glue console, select Visual ETL, title the job e.g. Import relationship data from Parquet on S3 into AuraDB
-2. Select Amazon S3 from the list of Sources, and select S3 source type, S3 location and Browse to S3 to locate the files for import
-3. Select the Parquet files containing the nodes and relationships for import first
-4. Use a transformer, e.g. "SQL Query" to create the needed output pattern, which should be `(v$person_id, roles, v$movie_id`). 
-5. From the list of targets select `Neo4j-Connector-for-AWS-Glue`
-6. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`
-7. The table name should be set to the (virtual) relationship table: `Person_ACTED_IN_Movie`.
-8. Start the import job.
+. In the AWS Glue console, select *Visual ETL* and give a name to the job (for example "Import relationship data from Parquet on S3 into AuraDB").
+. Select *Amazon S3* from the list of sources, then select *S3 source type* -> *S3 location* and *Browse to S3* to locate the files to import.
+. Select the Parquet files containing the nodes and relationships to import first.
+. Use a transformer such as *SQL Query* to create the needed output pattern, which in this example is`(v$person_id, roles, v$movie_id`). 
+. From the list of targets select `Neo4j-Connector-for-AWS-Glue`.
+. For the target properties provide the `aws-glue-connection-to-neo4j-auradb`.
+. The table name should be set to the (virtual) relationship table as `Person_ACTED_IN_Movie`.
+. Start the import job.
 
 === Exporting from AuraDB/Neo4j
 1. In the AWS Glue console, select Visual ETL, title the job e.g. _Export data from AuraDB to Parquet on S3_
