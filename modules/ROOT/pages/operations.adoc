@@ -2,7 +2,7 @@
 
 [#operations-read]
 == Read from AuraDB/Neo4j (export)
-The source for export is the connection created during the installation step e.g. `aws-glue-connection-to-neo4j-auradb`.
+The source for export is the connection created during the installation step, for example `aws-glue-connection-to-neo4j-auradb`.
 
 The target for the exported data can be any of AWS Glue's supported data sources, for example CSV or Parquet files on S3 or RDBMS with appropriate transformation steps.
 
@@ -10,26 +10,11 @@ The target for the exported data can be any of AWS Glue's supported data sources
 == Write to AuraDB/Neo4j (import)
 The source data can be any of AWS Glue's supported data sources, for example CSV or Parquet files on S3 or RDBMS with appropriate transformation steps.
 
-The target for import will be the connection created during the installation step e.g. `aws-glue-connection-to-neo4j-auradb`.
+The target for import will be the connection created during the installation step, for example `aws-glue-connection-to-neo4j-auradb`.
 
 Before you can import data into an empty database you need to define a blueprint in AuraDB/Neo4j that describes the schema of the data that will be imported.
 This blueprint must describe all the node labels, relationship types and properties that exist in the dataset to be imported.
 This is because the Neo4j database is schema optional and AWS Glue expects schema on write which is typical for RDBMS databases. 
-
-////
-For example
-
-[WARNING]
-====
-**TODO**
-
-```cypher
-CREATE (m:NewMovie:Temp{title:'placeholder'})
-<add some properties too>
-<create a relationship>
-```
-====
-////
 
 Attempting to import data without creating this blueprint schema will result in the following error 
 ```
@@ -38,22 +23,10 @@ Glue ETL Marketplace: table does not exist.
 This message applies if the target node label, properties or relationship types that do not exist, the error message will be the same in all cases.
 
 === Nodes
-Nodes must be imported before relationships, and while AWS Glue only permits a single instance of a job to be run at once the job itself may import from multiple files that describe the nodes and labels at the same time i.e. in parallel.
+Nodes must be imported before relationships, and while AWS Glue only permits a single instance of a job to be run at once the job itself may import from multiple files that describe the nodes and labels at the same time in parallel.
 
 === Relationships
 Relationships must be created after the nodes in the import job or from a different import job after the node import job has completed.
-Relationships can only be created in the Visual ETL tool by creating a Custom Code Block that provides the Cypher code to create the relationships. 
+In the Visual ETL tool, you can only create relationships using a transformation such as *SQL Query* that provides the needed parameters.
+See the [Neo4j JDBC docs](https://neo4j.com/docs/jdbc-manual/current/sql2cypher/#s2c_manipulating_relationships) for more information.
 
-////
-For example
-
-[WARNING]
-====
-**TODO**
-
-```cypher
-<Guhan to provide his code sample>
-```
-====
-
-////
