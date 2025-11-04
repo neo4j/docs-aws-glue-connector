@@ -3,10 +3,10 @@
 == Installation
 
 === Upload the jar and connection details
-1. Download the most recent version of the connector from link:https://github.com/neo4j/neo4j-aws-glue/releases[AWS Glue connector - GitHub].
-2. Upload the connector, `neo4j-aws-glue-<version>.jar` file to Amazon S3 bucket.
-3. Store the connection details for Neo4j or AuraDB in AWS Secret Manager as key/value pairs for _user_ and _password_.
-4. Record/copy the Secret ARN as this will be required later when using the secret from the connection.
+. Download the most recent version of the connector from link:https://github.com/neo4j/neo4j-aws-glue/releases[AWS Glue connector - GitHub].
+. Upload the connector, `neo4j-aws-glue-<version>.jar` file to Amazon S3 bucket.
+. Store the connection details for Neo4j or AuraDB in AWS Secret Manager as key/value pairs for _user_ and _password_.
+. Record/copy the Secret ARN as this will be required later when using the secret from the connection.
 
 [NOTE]
 ====
@@ -16,23 +16,23 @@ Instead of using the naming from the environment file (_neo4j_user_ and _neo4j_p
 === Create a custom connector 
 In the AWS Glue console
 
-1. Select _Create custom connector_.
-2. Give the connector a name e.g. `Neo4j-Connector-for-AWS-Glue`.
-3. For _Connector S3 URL_ provide the link to the connector in the S3 bucket (from above).
-4. Provide the class name `org.neo4j.jdbc.Neo4jJdbcDriver`.
-5. Provide the following JDBC base URL `jdbc:neo4j+s://<aura>?enableSQLTranslation=true` to enable the JDBC driver's built-in translator feature to translate SQL commands to Cypher.
-6. Set the URL parameter delimiter to `&`.
+. Select _Create custom connector_.
+. Give the connector a name. For example `Neo4j-Connector-for-AWS-Glue`.
+. For _Connector S3 URL_ provide the link to the connector in the S3 bucket (from above).
+. Provide the class name `org.neo4j.jdbc.Neo4jJdbcDriver`.
+. Provide the following JDBC base URL `jdbc:neo4j+s://<aura>?enableSQLTranslation=true` to enable the JDBC driver's built-in translator feature to translate SQL commands to Cypher.
+. Set the URL parameter delimiter to `&`.
 
 === Creating a connection
 
 A connection can only be created after you have created the custom connector in the previous step.
 It is essential to use the key/value pairs of _user_ and _password_ provided in the AWS Secrets Manager because those properties must be used for the actual connection. 
 
-1. Provide a connection name e.g. `aws-glue-connection-to-neo4j-auradb`.
-2. For connection credential type, select _<default>_.
-3. For AWS Secret, select _Secret from this account_.
-4. Provide the name of the secret used to store the credentials above.
-5. Expand Additional Options and provide the following additional parameters as pairs.
+. Provide a connection name. For example `aws-glue-connection-to-neo4j-auradb`.
+. For connection credential type, select _<default>_.
+. For AWS Secret, select _Secret from this account_.
+. Provide the name of the secret used to store the credentials above.
+. Expand Additional Options and provide the following additional parameters as pairs.
 
 |====
 |Key|Property
@@ -57,21 +57,21 @@ CREATE (p)-[:ACTED_IN{roles: ['Neo']}]->(m)
 ====
 
 === Importing nodes into AuraDB/Neo4j
-1. In the AWS Glue console, select *Visual ETL*, title the job (for example "Import data from Parquet on S3 into AuraDB").
-2. Select *Amazon S3* from the list of sources, and select *S3 source type*, *S3 location* and *Browse to S3* to locate the files for import.
-3. Select the Parquet files containing the nodes for import first.
-4. Select _Infer schema_.
-5. From the list of targets select `Neo4j-Connector-for-AWS-Glue`.
-6. For the target properties provide the `aws-glue-connection-to-neo4j-auradb`.
-7. The table name should be set to the name of the labels that are to be imported e.g. `Movie`.
-8. The schema will be displayed, if you want to drop any columns then add a *Transform - DropFields* step (or other suitable transformations).
+. In the AWS Glue console, select *Visual ETL*, title the job (for example "Import data from Parquet on S3 into AuraDB").
+. Select *Amazon S3* from the list of sources, and select *S3 source type*, *S3 location* and *Browse to S3* to locate the files for import.
+. Select the Parquet files containing the nodes for import first.
+. Select _Infer schema_.
+. From the list of targets select `Neo4j-Connector-for-AWS-Glue`.
+. For the target properties provide the `aws-glue-connection-to-neo4j-auradb`.
+. The table name should be set to the name of the labels that are to be imported, for example `Movie`.
+. The schema will be displayed, if you want to drop any columns then add a *Transform - DropFields* step (or other suitable transformations).
 If this data is from another Neo4j database then you should drop the `v$id`.
-9. Add flows for each set of import files and table names. For nodes these may be added in parallel.
-10. Start the import job.
+. Add flows for each set of import files and table names. For nodes these may be added in parallel.
+. Start the import job.
 
 === Importing relationships into AuraDB/Neo4j
 Once the nodes have been imported you can import the relationships. 
-You can add these as additional steps after the steps to import the nodes i.e. in series OR create a new import job.
+You can add these as additional steps after the steps to import the nodes, for example in series OR create a new import job.
 
 . In the AWS Glue console, select *Visual ETL* and give a name to the job (for example "Import relationship data from Parquet on S3 into AuraDB").
 . Select *Amazon S3* from the list of sources, then select *S3 source type* -> *S3 location* and *Browse to S3* to locate the files to import.
@@ -83,14 +83,14 @@ You can add these as additional steps after the steps to import the nodes i.e. i
 . Start the import job.
 
 === Exporting from AuraDB/Neo4j
-1. In the AWS Glue console, select Visual ETL, title the job e.g. _Export data from AuraDB to Parquet on S3_.
-2. Select `Neo4j-Connector-for-AWS-Glue` from the list of *Sources*.
-3. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`.
-4. The Table name should be set to the name of the labels that are to be imported e.g. `Movie`.
-5. The _Data preview_ should populate with a sample of the data.
-6. Browse the list of targets and select *S3 source type*, *S3 location* and browse to *S3 location* for storing the Parquet files.
-7. The schema will be displayed, if you want to drop any columns then add a *Transform - DropFields* steps (or other suitable transformations).
+. In the AWS Glue console, select Visual ETL, title the job, for example _Export data from AuraDB to Parquet on S3_.
+. Select `Neo4j-Connector-for-AWS-Glue` from the list of *Sources*.
+. For the Target properties provide the `aws-glue-connection-to-neo4j-auradb`.
+. The Table name should be set to the name of the labels that are to be imported, for example `Movie`.
+. The _Data preview_ should populate with a sample of the data.
+. Browse the list of targets and select *S3 source type*, *S3 location* and browse to *S3 location* for storing the Parquet files.
+. The schema will be displayed, if you want to drop any columns then add a *Transform - DropFields* steps (or other suitable transformations).
 If this data is from another Neo4j database then you should drop the `v$id`.
-8. Add flows for each set of import files and table names. For nodes these may be added in parallel.
-9. Start the import job.
+. Add flows for each set of import files and table names. For nodes these may be added in parallel.
+. Start the import job.
 

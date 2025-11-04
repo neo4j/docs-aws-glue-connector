@@ -2,7 +2,7 @@
 
 [#operations-read]
 == Read from AuraDB/Neo4j (export)
-The source for export is the connection created during the installation step e.g. `aws-glue-connection-to-neo4j-auradb`.
+The source for export is the connection created during the installation step, for example `aws-glue-connection-to-neo4j-auradb`.
 
 The target for the exported data can be any of AWS Glue's supported data sources, for example CSV or Parquet files on S3 or RDBMS with appropriate transformation steps.
 
@@ -10,7 +10,7 @@ The target for the exported data can be any of AWS Glue's supported data sources
 == Write to AuraDB/Neo4j (import)
 The source data can be any of AWS Glue's supported data sources, for example CSV or Parquet files on S3 or RDBMS with appropriate transformation steps.
 
-The target for import will be the connection created during the installation step e.g. `aws-glue-connection-to-neo4j-auradb`.
+The target for import will be the connection created during the installation step, for example `aws-glue-connection-to-neo4j-auradb`.
 
 Before you can import data into an empty database you need to define a blueprint in AuraDB/Neo4j that describes the schema of the data that will be imported.
 This blueprint must describe all the node labels, relationship types and properties that exist in the dataset to be imported.
@@ -23,7 +23,7 @@ Glue ETL Marketplace: table does not exist.
 This message applies if the target node label, properties or relationship types that do not exist, the error message will be the same in all cases.
 
 === Nodes
-Nodes must be imported before relationships, and while AWS Glue only permits a single instance of a job to be run at once the job itself may import from multiple files that describe the nodes and labels at the same time i.e. in parallel.
+Nodes must be imported before relationships, and while AWS Glue only permits a single instance of a job to be run at once the job itself may import from multiple files that describe the nodes and labels at the same time in parallel.
 
 === Relationships
 Relationships must be created after the nodes in the import job or from a different import job after the node import job has completed.
