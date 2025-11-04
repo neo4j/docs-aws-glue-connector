@@ -28,5 +28,5 @@ Nodes must be imported before relationships, and while AWS Glue only permits a s
 === Relationships
 Relationships must be created after the nodes in the import job or from a different import job after the node import job has completed.
 Relationships can only be created in the Visual ETL tool by creating a transformation (e.g. "SQL Query") that provides the needed parameters to create the relationships.
-See [Neo4j Driver relationships](https://neo4j.com/docs/jdbc-manual/current/sql2cypher/#s2c_manipulating_relationships) for more information.
+See the [Neo4j JDBC docs](https://neo4j.com/docs/jdbc-manual/current/sql2cypher/#s2c_manipulating_relationships) for more information.
 
