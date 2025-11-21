@@ -19,7 +19,7 @@ In the AWS Glue console
 . Select _Create custom connector_.
 . Give the connector a name. For example `Neo4j-Connector-for-AWS-Glue`.
 . For _Connector S3 URL_ provide the link to the connector in the S3 bucket (from above).
-. Provide the class name `org.neo4j.jdbc.Neo4jJdbcDriver`.
+. Provide the class name `org.neo4j.jdbc.Neo4jDriver`.
 . Provide the following JDBC base URL `jdbc:neo4j+s://<aura>?enableSQLTranslation=true` to enable the JDBC driver's built-in translator feature to translate SQL commands to Cypher.
 . Set the URL parameter delimiter to `&`.
 
